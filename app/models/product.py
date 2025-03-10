@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional,List
 from datetime import datetime
 from bson import ObjectId
 
@@ -17,6 +17,7 @@ class ProductCreate(BaseModel):
     price: float
     stock: int
     category: str
+    images: Optional[List[str]] = [] 
 
 class ProductResponse(ProductCreate):
     id: str

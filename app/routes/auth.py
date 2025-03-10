@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
-from app.models.user import UserCreate, UserLogin
-from app.services.user_service import create_user, authenticate_user
+# app/routers/auth.py
+from fastapi import APIRouter, HTTPException, Depends, status
+from app.models.user import UserCreate, UserLogin, UserResponse
+from app.services.user_service import create_user, authenticate_user, get_user_by_id
+from app.dependencies.auth import get_current_user
 from app.core.security import create_access_token
 from datetime import timedelta
 
@@ -16,5 +18,15 @@ def signin(login_data: UserLogin):
     user = authenticate_user(login_data.email, login_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    token = create_access_token({"sub": user["email"]}, timedelta(hours=1))
+    token = create_access_token(
+        {"sub": user["email"], "user_id": str(user["_id"])},  # Include both email and ID
+        timedelta(hours=1)  # Token expiration time
+    )
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/{user_id}", response_model=UserResponse)
+def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

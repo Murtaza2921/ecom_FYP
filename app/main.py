@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, product, order,notification, analytics, activity, push,order_tracking,inventory,report,promotion,chat
+from app.routes import auth, product, order,notification, analytics, activity, push,order_tracking,inventory,report,promotion,chat,chatbot
 
 app = FastAPI()
 
@@ -15,6 +15,7 @@ app.include_router(inventory.router, prefix="/inventory", tags=["Inventory"])
 app.include_router(report.router, prefix="/reports", tags=["Reports"])
 app.include_router(promotion.router, prefix="/promotions", tags=["Promotions"])
 app.include_router(chat.router, prefix="/support", tags=["Chat"])
+app.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 
 if __name__ == "__main__":
     import uvicorn

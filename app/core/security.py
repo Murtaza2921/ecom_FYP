@@ -1,7 +1,19 @@
 from passlib.context import CryptContext
-from jose import jwt
+from jose import JWTError, jwt
+from fastapi import APIRouter, HTTPException, Depends , status
+from fastapi.security import OAuth2PasswordBearer
+from typing import Optional
 from app.core.config import settings
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv()
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # Token URL for authentication
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -16,3 +28,5 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     expire = datetime.utcnow() + (expires_delta or timedelta(hours=1))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+

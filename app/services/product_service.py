@@ -1,16 +1,17 @@
 from app.db.database import db
 from datetime import datetime
 from bson.objectid import ObjectId
-from app.models.product import ProductResponse
+from app.models.product import ProductResponse,ProductCreate
 products_collection = db['products']
 
-def create_product(product_data):
+def create_product(product_data: ProductCreate):
     product = {
         "name": product_data.name,
         "description": product_data.description,
         "price": product_data.price,
         "stock": product_data.stock,
         "category": product_data.category,
+        "images": product_data.images,  # Add images here
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
     }
@@ -31,3 +32,6 @@ def update_product(product_id, updates):
 
 def delete_product(product_id):
     products_collection.delete_one({"_id": ObjectId(product_id)})
+
+
+
