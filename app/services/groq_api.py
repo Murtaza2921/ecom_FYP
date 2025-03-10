@@ -1,6 +1,6 @@
 import openai
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 
 def generate_query(user_prompt):
     """Converts user input into a MongoDB query using Groq API."""
