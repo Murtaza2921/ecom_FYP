@@ -3,123 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Product Chatbot</title>
+    <title>Product Chatbot</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             text-align: center;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
         }
-        #chat-box {
+
+        .chat-container {
             width: 50%;
-            height: 400px;
-            border: 1px solid #ccc;
-            overflow-y: auto;
             margin: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
             padding: 10px;
-            background-color: #f9f9f9;
-        }
-        #user-input {
-            width: 40%;
-            padding: 10px;
-        }
-        button {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .user-message {
-            text-align: right;
-            color: blue;
-        }
-        .bot-message {
-            text-align: left;
-            color: green;
-        }
-        .loading {
-            font-style: italic;
-            color: gray;
-        }
-        .product-img {
-            width: 100px;
-            height: auto;
             border-radius: 5px;
-            margin-top: 5px;
+            background-color: #fff;
+            text-align: left;
+        }
+
+        .user-message {
+            font-weight: bold;
+            color: #007bff;
+            margin: 5px 0;
+        }
+
+        .bot-message {
+            font-weight: bold;
+            color: #28a745;
+            margin: 5px 0;
+        }
+
+        .input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .send-btn {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .send-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>AI Product Chatbot</h1>
-    <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="Ask about products...">
-    <button onclick="sendMessage()">Send</button>
+
+    <h1>Product Chatbot</h1>
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" class="chat-input" placeholder="Ask about a product...">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
     <script>
-        async function sendMessage() {
-            const userInput = document.getElementById("user-input").value.trim();
-            if (userInput === "") return;
+        function sendMessage() {
+            let userInput = document.getElementById("user-input").value;
+            let chatBox = document.getElementById("chat-box");
 
-            displayMessage("You", userInput, "user-message");
-            addLoading();
+            if (userInput.trim() === "") return;
 
-            try {
-                const response = await fetch("http://127.0.0.1:8000/chatbot/", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: userInput })
-                });
+            // Display user message
+            let userMessage = `<p class="user-message">You: ${userInput}</p>`;
+            chatBox.innerHTML += userMessage;
 
-                const data = await response.json();
-                removeLoading();
-                displayMessage("Chatbot", formatResponse(data.response), "bot-message");
-            } catch (error) {
-                removeLoading();
-                displayMessage("Chatbot", "Error fetching response. Try again!", "bot-message");
-                console.error("Error:", error);
-            }
+            // Simulating bot response (replace this with API call)
+            fetch("http://127.0.0.1:8000/search/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let botMessage = `<p class="bot-message">Bot: ${data.message}</p>`;
+                chatBox.innerHTML += botMessage;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                let errorMessage = `<p class="bot-message">Bot: Sorry, I couldn't process your request.</p>`;
+                chatBox.innerHTML += errorMessage;
+            });
 
-            document.getElementById("user-input").value = "";
-        }
-
-        function displayMessage(sender, message, className) {
-            const messageElement = document.createElement("p");
-            messageElement.className = className;
-            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-            document.getElementById("chat-box").appendChild(messageElement);
-            document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-        }
-
-        function formatResponse(response) {
-            if (!response) {
-                return "No results found.";
-            }
-
-            if (response.Comparison) {
-                return `Comparing: ${response.Comparison.join(" vs ")}<br><br>` +
-                response.Details.map(p => 
-                    `<strong>${p.name}</strong><br>Price: $${p.price}<br>Stock: ${p.stock}<br>
-                    Category: ${p.category}<br>
-                    ${p.images.length > 0 ? `<img src="${p.images[0]}" class="product-img">` : "No image available"}<br><br>`
-                ).join("");
-            } else {
-                return JSON.stringify(response, null, 2);
-            }
-        }
-
-        function addLoading() {
-            const loadingElement = document.createElement("p");
-            loadingElement.className = "loading";
-            loadingElement.id = "loading";
-            loadingElement.innerHTML = "Chatbot is typing...";
-            document.getElementById("chat-box").appendChild(loadingElement);
-            document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-        }
-
-        function removeLoading() {
-            const loadingElement = document.getElementById("loading");
-            if (loadingElement) {
-                loadingElement.remove();
-            }
+            document.getElementById("user-input").value = ""; // Clear input field
         }
     </script>
+
 </body>
 </html>

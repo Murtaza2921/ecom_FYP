@@ -1,9 +1,8 @@
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from fastapi import APIRouter, HTTPException, Depends , status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
-from app.core.config import settings
+#from app.core.config import settings
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
@@ -27,6 +26,6 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(hours=1))
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 

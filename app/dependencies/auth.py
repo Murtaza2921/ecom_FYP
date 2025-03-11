@@ -3,10 +3,16 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from typing import Optional, Callable
-from app.core.config import settings
+#from app.core.config import settings
 from app.services.user_service import get_user_by_id
 from app.models.user import UserResponse
 import logging
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 
 def get_user_by_id_dependency() -> Callable:
     return get_user_by_id
@@ -26,7 +32,7 @@ async def get_current_user(
     )
     try:
         logger.info(f"Decoding token: {token}")
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         logger.info(f"Token payload: {payload}")
         user_id: Optional[str] = payload.get("user_id")
         if user_id is None:

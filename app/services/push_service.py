@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import messaging, credentials
 import os
-cred_path = os.path.join(os.path.dirname(__file__), '../../ecom-50c5e-firebase-adminsdk-9ekxv-b995f3b3d9.json')
+cred_path = os.path.join(os.path.dirname(__file__), '../../ecom-50c5e-firebase-adminsdk-9ekxv-8dcc29699c.json')
 
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
